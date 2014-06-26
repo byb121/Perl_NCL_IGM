@@ -1,0 +1,262 @@
+#!/usr/bin/perl;
+use strict;
+use warnings;
+use Getopt::Long;
+use Excel::Writer::XLSX;
+
+my ($sampleNames, $sampleColumns, $input_file, $output_excel, $help);
+my $CNV_file="";
+
+usage() if ( @ARGV < 1 || ! GetOptions('help|?' => \$help, 'sampleNames=s' => \$sampleNames, 'sampleColumns=s' => \$sampleColumns, 'in=s' => \$input_file, 'out=s' => \$output_excel, 'CNV=s' => \$CNV_file ) || defined $help );
+
+unless (defined $sampleNames) {
+	die "You have not supplied sample names using --sampleNames\n";
+}
+
+unless (defined $sampleColumns) {
+	die "You have to specify which column(s) have sample genotype using --sampleColumns\n";
+}
+
+unless (defined $input_file) {
+	die "You have not supplied a input file with --in\n";
+}
+
+unless (defined $output_excel) {
+	die "You have not supplied the output file name with --out\n";
+}
+
+my @sample_names = split(",", $sampleNames);
+my @sample_columns = split(",", $sampleColumns);
+
+if(scalar @sample_columns != scalar @sample_names) {
+	die "Number of sample names and columns are inconsistent.\n";
+}
+
+my @output_all;
+my @output_filtered;
+my @output_possibleHits;
+my @output_Xlinked;
+my @output_ARmodelHits;
+my @output_CNV;
+my %CNV_regions;
+my %gene_name_count; #it's for selecting Xlinked rare variants
+
+if ($CNV_file ne "") {
+	open CNV, $CNV_file or die "Cannot open the CNV file $CNV_file\n";
+	while (my $line=<CNV>) {
+		chomp $line;
+		my @elements=split("\t", $line);
+		my $id = $elements[0];
+		if (ElementInArray(\@sample_names, $id) eq "YES") { # if the ID is in sample names
+			push @output_CNV, $line;
+			my $start=$elements[4];
+			my $end=$elements[5];
+			my $chr="chr".$elements[6];
+			$CNV_regions{$id}{$chr}{$start}{$end} = $elements[8] ;
+		}
+	}
+}
+close CNV;
+
+open INPUT, $input_file or die "Cannot open the file $input_file.\n";
+while (my $line=<INPUT>) {
+	if ($line !~ m/^Func\t/) {
+		my @elements = split("\t", $line);
+		if ($elements[26] ne "unknown") { # insert "unknown" to make every row in the same length
+			splice @elements, 26, 0, 'unknown'; 
+		}
+		
+		if($elements[2] eq "synonymous SNV") { # eliminate synonymous SNV
+			next;
+		}
+		
+		my $sample_string="";
+		my $rr_na_sum=0;
+		for (my $i=0;$i<scalar @sample_names;$i++) {
+			my $on_CNV="NO";
+			start_loop: foreach my $start ( sort {$a<=>$b} keys %{$CNV_regions{$sample_names[$i]}{$elements[27]}} ) {
+				foreach my $end (keys %{$CNV_regions{$sample_names[$i]}{$elements[27]}{$start}}) {
+					if ( $elements[28] >= $start && $elements[28] <= $end) {
+						$on_CNV=$CNV_regions{$sample_names[$i]}{$elements[27]}{$start}{$end};
+						last start_loop;
+					}
+				}
+			}
+			$sample_string=$sample_string.$elements[$sample_columns[$i]]."\t".$elements[$sample_columns[$i]+1]."\t".$on_CNV."\t";
+			if($elements[$sample_columns[$i]+1] eq 'R/R' || $elements[$sample_columns[$i]+1] eq 'NA') {
+				$rr_na_sum=+1;
+			}
+		}
+		
+		my $length = scalar @elements -1;
+		my $string_1 = $elements[27]."\t".$elements[28]."\t".$elements[29]."\t".$elements[30]."\t"
+		.$elements[31]."\t".$elements[35]."\t".$elements[32]."\t".$elements[0]."\t".$elements[$length-9]."\t".$elements[$length-8]
+		."\t".$elements[$length-7]."\t".$elements[2]."\t".$elements[3]."\t".$elements[4]."\t".$elements[5]."\t".$elements[6]."\t"
+		.$elements[7]."\t".$elements[$length-6]."\t".$elements[8]."\t".$elements[9]."\t".$elements[10]."\t".$elements[11]."\t".$elements[12]."\t".
+		$elements[13]."\t".$elements[14]."\t".$elements[15]."\t".$elements[16]."\t".$elements[17]."\t".$elements[18]."\t".$elements[19]."\t".$elements[20]."\t"
+		.$elements[33]."\t".$elements[36]."\t"; #re-arrange columns
+		
+		
+		$elements[$length-2] =~ s/\'/\"/g;
+		$elements[$length-1] =~ s/\'/\"/g;
+		$elements[$length] =~ s/\'/\"/g;
+		
+		my $string_2 = $elements[34]."\t".$elements[$length-5]."\t".$elements[$length-4]."\t".$elements[$length-3]."\t".$elements[$length-2]
+		."\t".$elements[$length-1]."\t".$elements[$length]; #re-arrange columns
+		
+		if($rr_na_sum < scalar @sample_names) { # RR and NA are removed
+			push @output_all, $string_1.$sample_string.$string_2;
+			
+			# for filtered spreadsheet
+			if($elements[6] eq "" ) {
+				$elements[6] = 0;
+			}
+			if($elements[7] eq "" ) {
+				$elements[7] = 0;
+			}
+			
+			if( $elements[6] <= 0.05 && $elements[7] <= 0.05 ) {
+				push @output_filtered, $string_1.$sample_string.$string_2;
+				
+				unless(exists $gene_name_count{$elements[$length-9]}) {
+					$gene_name_count{$elements[$length-9]} = 0;
+				}
+				
+				# for possible hits spreadsheet
+				my $number_deleterious_predictions=0;
+				if($elements[13] eq "D") {
+					$number_deleterious_predictions+=1;
+				}
+				if($elements[15] eq "D" || $elements[15] eq "P") {
+					$number_deleterious_predictions+=1;
+				}
+				if($elements[17] eq "D") {
+					$number_deleterious_predictions+=1;
+				}
+				if($elements[19] eq "A" || $elements[15] eq "D") {
+					$number_deleterious_predictions+=1;
+				}
+				
+				my $number_CompoundHet=0;
+				foreach my $sample_col (@sample_columns) {
+					if($elements[$sample_col+1] eq "V1/V2") {
+						$number_CompoundHet +=1;
+					}
+				}
+				
+				#for Xlinked rare variants
+				if($number_CompoundHet < scalar @sample_names) {
+					$gene_name_count{$elements[$length-9]} =$gene_name_count{$elements[$length-9]}+1;
+				}
+				
+				if ($elements[$length-7] eq "YES" && $number_deleterious_predictions >=2) {
+					push @output_possibleHits, $string_1.$sample_string.$string_2;
+				} elsif ($elements[$length-7] eq "NO" && $number_deleterious_predictions ==4) {
+					push @output_possibleHits, $string_1.$sample_string.$string_2;
+				} elsif($elements[35] eq "SNP" && $number_CompoundHet >=1) {
+					push @output_possibleHits, $string_1.$sample_string.$string_2;
+				}
+				
+				# AR model Hits
+				my $number_Homo=0;
+				foreach my $sample_col (@sample_columns) {
+					if($elements[$sample_col+1] eq "V/V") {
+						$number_Homo +=1;
+					}
+				}
+				if ($number_Homo == scalar @sample_names) {
+					if ( $elements[27] !~ m/chr[XYMxym]/ ) {
+						push @output_ARmodelHits, $string_1.$sample_string.$string_2;
+					}
+				}
+			}
+		}
+	}
+}
+close(INPUT);
+
+# output in excel format
+my @header = ('Chr', 'Start', 'Strand', 'Ref', 'Obs', 'SNPorINDEL', 'VariantCall_quality', 'Func', 'GeneName', 'GeneID', 'isInterested', 'ExonicFunc',	
+'AAChange', 'Conserved', 'SegDup', 'ESP6500_ALL', '1000g2012feb_ALL', 'InHouseMAF', 'dbSNP135', 'AVSIFT', 'LJB_PhyloP', 'LJB_PhyloP_Pred', 'LJB_SIFT', 
+'LJB_SIFT_Pred', 'LJB_PolyPhen2', 'LJB_PolyPhen2_Pred', 'LJB_LRT', 'LJB_LRT_Pred', 'LJB_MutationTaster', 'LJB_MutationTaster', 'Pred LJB_GERP++', 'Filter',	 'FORMAT')	;
+
+foreach my $sample (@sample_names) {
+	push @header, $sample;
+	push @header, $sample.".anno";
+	push @header, $sample.".cnv";
+}
+my @header_2 = ('INFO', 'GoTerm', 'WikiGene_Description', 'MIM_Gene_Description', 'GeneCard Link', 'OMIM Link', 'Uniprot Link');
+push @header, @header_2;
+
+my $workbook = Excel::Writer::XLSX->new($output_excel);
+my $worksheet_all = $workbook->add_worksheet('ALL');
+$worksheet_all->write_row(0,0,\@header);
+for (my $i=0;$i< scalar @output_all;$i++) {
+	my @row = split("\t", $output_all[$i]);
+	$worksheet_all->write_row($i+1,0,\@row);
+}
+
+my $worksheet_filtered = $workbook->add_worksheet('Filtered');
+$worksheet_filtered->write_row(0,0,\@header);
+for (my $i=0;$i< scalar @output_filtered;$i++) {
+	my @row = split("\t", $output_filtered[$i]);
+	$worksheet_filtered->write_row($i+1,0,\@row);
+	if($gene_name_count{$row[8]} >= 2) {
+		push @output_Xlinked, $output_filtered[$i];
+	}
+}
+
+my $worksheet_xlinked = $workbook->add_worksheet('XLinked');
+$worksheet_xlinked->write_row(0,0,\@header);
+for (my $i=0;$i< scalar @output_Xlinked;$i++) {
+	my @row = split("\t", $output_Xlinked[$i]);
+	$worksheet_xlinked->write_row($i+1,0,\@row);
+}
+
+my $worksheet_possibleHits = $workbook->add_worksheet('PossibleHits');
+$worksheet_possibleHits ->write_row(0,0,\@header);
+for (my $i=0;$i< scalar @output_possibleHits;$i++) {
+	my @row = split("\t", $output_possibleHits[$i]);
+	$worksheet_possibleHits->write_row($i+1,0,\@row);
+}
+
+my $worksheet_ARmodelHits = $workbook->add_worksheet('AR_model_Hits');
+$worksheet_ARmodelHits ->write_row(0,0,\@header);
+for (my $i=0;$i< scalar @output_ARmodelHits;$i++) {
+	my @row = split("\t", $output_ARmodelHits[$i]);
+	$worksheet_ARmodelHits->write_row($i+1,0,\@row);
+}
+
+if ($CNV_file ne "") {
+	my @CNV_header=('SampleID', 'start.p', 'end.p', 'type', 'nexons', 'start', 'end', 'chromosome', 'id', 'BF', 'reads.expected', 'reads.observed', 	
+	'reads.ratio', 'Conrad.hg19', 'exons.hg19', 'Averagecontrols_DupDel_acrossCNV', 	
+	'min_controls', 'max_controls', 'FullGenesNames', 'GO-terms', 'OMIM');
+	my $worksheet_CNV = $workbook->add_worksheet('CNV');
+	$worksheet_CNV -> write_row(0,0,\@CNV_header);
+	for (my $i=0;$i< scalar @output_CNV;$i++) {
+		my @row = split("\t", $output_CNV[$i]);
+		$worksheet_CNV -> write_row($i+1,0,\@row);
+	}
+}
+
+$workbook->close();
+
+exit;
+
+sub ElementInArray {
+	my ($array_ref, $item) = @_;
+	my $result="NO";
+	my @array_test = @{$array_ref};
+	foreach my $element (@array_test) {
+		if($element eq $item) {
+			$result = "YES";
+		}
+	}
+	return $result;
+}
+
+sub usage {
+    print "Unknown option: @_\n" if ( @_ );
+    print "\nusage: wAnnovarOutput_to_Excel.pl [--sampleNames Sample_1,Sample_2,...] [--in wAnnovar output CSV file] [--out output excel file name] [--CNV CNV result file][-help|-?]\n\n";
+	return(1);
+}

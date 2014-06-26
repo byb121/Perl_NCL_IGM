@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;ExomePipeline/coverage_summary_on_exon_list_on_sample_list.pl&apos; to &apos;ExonList2Bed.pl&apos;" description="Rename resource &apos;coverage_summary_on_exon_list_on_sample_list.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="coverage_summary_on_exon_list_on_sample_list.pl" name="ExonList2Bed.pl" stamp="1362075319801" updateReferences="true"/>
+</session>

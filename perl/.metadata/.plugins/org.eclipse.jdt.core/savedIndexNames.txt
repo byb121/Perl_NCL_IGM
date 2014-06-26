@@ -1,0 +1,1 @@
+INDEX VERSION 1.126+/home/yaobo/Documents/Dropbox/Bob/perl/.metadata/.plugins/org.eclipse.jdt.core

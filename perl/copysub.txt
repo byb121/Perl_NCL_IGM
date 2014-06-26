@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+use warnings;
+
+$dna = 'AAATTCCGG';
+
+$long_dna = addACGT($dna);
+
+
+print "I added ACGT to $dna and got $long_dna\n";
+
+
+exit;
+
+
+sub addACGT {
+
+	my($dna) = @_;
+	$dna .= 'ACGT';
+	return $dna;
+}
+

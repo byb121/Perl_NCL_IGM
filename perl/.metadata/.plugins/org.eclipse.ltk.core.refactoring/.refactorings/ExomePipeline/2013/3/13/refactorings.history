@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;ExomePipeline/bed2intervals.pl&apos; to &apos;change2intervals.pl&apos;" description="Rename resource &apos;bed2intervals.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="bed2intervals.pl" name="change2intervals.pl" stamp="1364317123192" updateReferences="true"/>
+</session>

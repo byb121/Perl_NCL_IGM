@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Coverage</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.epic.perleditor.perlbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.epic.perleditor.perlnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>coverage_hg18_update.pl</name>
+			<type>1</type>
+			<location>/home/yaobo/Documents/perl/coverage_hg18_update.pl</location>
+		</link>
+		<link>
+			<name>coverage_newloop.pl</name>
+			<type>1</type>
+			<location>/home/yaobo/Documents/perl/Coverage/coverage_newloop.pl</location>
+		</link>
+	</linkedResources>
+</projectDescription>

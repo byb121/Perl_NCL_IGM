@@ -1,0 +1,13 @@
+ENABLE_DEBUG_CONSOLE=0
+SHOW_WARNINGS=1
+SYNTAX_VALIDATION_PREFERENCE=0
+USE_TAINT_MODE=0
+eclipse.preferences.version=1
+moduleStarterLocation=/usr/bin/module-starter
+sourceCriticLevel1=Warning
+sourceCriticLevel2=Warning
+sourceCriticLevel3=Warning
+sourceCriticLevel4=Warning
+sourceCriticLevel5=Warning
+sourceCriticLocation=/usr/bin/perlcritic
+sourceCriticSeverity=default

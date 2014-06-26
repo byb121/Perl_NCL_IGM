@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+	my $folder = "/home/illumina/ReferenceGenomes";
+	my @files = ();
+	
+	unless(opendir(FOLDER, $folder)) {
+			print "Cannot open folder $folder!\n";
+			exit;
+	} 
+	
+	@files = readdir(FOLDER);
+	closedir(FOLDER);
+	while (my $file = each(@files)) {
+		print $file,"\n";
+	}
+

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.epic.debug.launchConfigurationPerl">
+<stringAttribute key="ATTR_PROJECT_NAME" value="Coverage"/>
+<stringAttribute key="ATTR_STARTUP_FILE" value="coverage_hg18_5array.pl"/>
+</launchConfiguration>
