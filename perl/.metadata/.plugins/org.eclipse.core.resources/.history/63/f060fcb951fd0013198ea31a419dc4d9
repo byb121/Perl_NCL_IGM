@@ -123,6 +123,22 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 			}
 			
 			if( $first_V eq $variants) {
+				if ($GQ < $gene_type_call_qual) {
+					#$GT = "R/R";
+					$GT = "NA"; #low qual genotype ... make a null call "NA"
+				} elsif ($GT =~ m/0\/0/) {
+					$GT = "R/R";
+				} elsif ($GT =~ m/0\/[123456789]/) {
+					$GT = "R/V";
+				} elsif ($GT =~ m/([123456789])\/([123456789])/) {
+					my $left = $1;
+					my $right = $2;
+					if($left!=$right) {
+					$GT = "V1/V2"; 
+					} else {
+					$GT = "V/V";
+					}
+				}
 				$sample_call_processed = $sample_call_processed."\t".$sample;
 			} else {
 				#determine which alternative allele is moved to the front

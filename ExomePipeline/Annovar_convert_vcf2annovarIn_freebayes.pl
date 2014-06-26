@@ -47,6 +47,7 @@ line: foreach $Line (<INPUT>){
 		my $v_now = $v;
 		my $pos_1_now = $pos_1;
 		my $pos_2_now = $pos_2;
+		my $Sample_Call_Processed = AddGenoTypeToSampleCalls_CompondHet($v, $var, $format, $Sample_Call);
 		my $out_var=$v;
 		for (my $i=0;$i<scalar @vars;$i++) {
 			if($v ne $vars[$i]) {
@@ -67,24 +68,42 @@ line: foreach $Line (<INPUT>){
 			my @var_chars=split(//, $v_now);
 			my @ref_chars=split(//, $ref_now);
 			if(length($v_now) >= length($ref_now)){ #insertion
-				for(my $i=0;$i<scalar @var_chars;$i++) {
-					
+				Compare1:	for(my $i=0;$i<scalar @ref_chars;$i++) {
+					if($ref_chars[$i] eq $var_chars[$i]) {
+						if ($i != scalar @ref_chars-1) {
+							my @temp_chars = split(//, $ref_now);
+							shift @temp_chars;
+							$ref_now=join '', @temp_chars;
+						} else {
+							$ref_now="-";
+						}
+						my @temp_chars = split(//, $v_now);
+						shift @temp_chars;
+						$v_now=join '', @temp_chars;
+						$pos_1_now++;
+					} else {
+						last Compare1;
+					}
 				}
-				$ref_now="-";
-				for (my $i=1;$i<=length($ref);$i++){
-					$v_now=~s/^.//;
-					$pos_1_now++;
-				}
-				$pos_2_now = $pos_1_now;
-			} elsif(length($v_now)==length($ref_now)) { #in fact a single base SNP on the first base of ref
-				$ref_now = substr $ref,0,1;
-				$v_now = substr $v,0,1;
+				$pos_2_now = $pos_1_now + length($ref_now) - 1;
 			} else { #deletion
-				for(my $i=1;$i <= length($v_now);$i++) {
-					$ref_now=~s/^.//;
-					$pos_1_now++;
+				Compare2:	for(my $i=0;$i<scalar @var_chars;$i++) {
+					if($var_chars[$i] eq $ref_chars[$i]) {
+						if ($i != scalar @var_chars -1) {
+							my @temp_chars = split(//, $v_now);
+							shift @temp_chars;
+							$v_now=join '', @temp_chars;
+						} else {
+							$v_now="-";
+						}
+						my @temp_chars = split(//, $ref_now);
+						shift @temp_chars;
+						$ref_now=join '', @temp_chars;
+						$pos_1_now++;
+					} else {
+						last Compare2;
+					}
 				}
-				$v_now="-";
 				$pos_2_now = $pos_1_now + length($ref_now) - 1;
 			}
 		}
@@ -97,3 +116,79 @@ close OUT;
 close INPUT;
 
 exit;
+
+
+sub AddGenoTypeToSampleCalls_CompondHet {
+	my ($first_V, $variants, $format, $sample_call) = @_;
+	my $gene_type_call_qual = 13; ##### genotype call quality cut off
+	my @format_fields = split(":", $format);
+	my $GT_index;
+	for (my $i=0;$i<scalar @format_fields ;$i++){
+		if ($format_fields[$i] =~ m/GT/) {
+			$GT_index = $i;
+		}		
+	}
+	my $sample_call_processed=""; # vcf_sample1 \t geno_sample1 \t vcf_sample2 \t geno_sample2 ....
+	my @sample_call_split = split("\t", $sample_call);
+	for(my $i=0;$i<scalar(@sample_call_split);$i++){
+		my $sample = $sample_call_split[$i];
+		if ($sample !~ m/\.\/\./) {
+			#print $sample."\n";
+			my @fields = split(":", $sample);
+			my $GT = $fields[$GT_index];
+			if( $first_V eq $variants) {
+				$sample_call_processed = $sample_call_processed."\t".$sample;
+			} else {
+				#determine which alternative allele is moved to the front
+				my @V = split("," , $variants);
+				my $V_index;
+				for(my $h=0;$h<scalar @V;$h++) {
+					if($first_V eq $V[$h]) {
+						$V_index = $h+1;
+					}
+				}
+				
+				my %temp_hash;
+				$temp_hash{$V_index} = 1;
+				
+				my $j = 2;
+				for(my $h=1;$h<=scalar @V;$h++) {
+					if ($h != $V_index) {
+						$temp_hash{$h} = $j;
+						$j+=1;
+					}
+				}
+				
+				my $left_number;
+				my $right_number;
+				if ($fields[$GT_index] =~ m/(\d)\/(\d)/ ) {
+					my $A_left = $1;
+					my $A_right = $2;
+					#print "left $A_left\n";
+					#print "right $A_right\n";
+					if ($A_left == $A_right && $A_left ==0 ) {
+						$left_number = "0";
+						$right_number = "0";
+					} elsif ( $A_left ==0 ) {
+						$left_number = 0;
+						$right_number = $temp_hash{$A_right};
+					} else {
+						$left_number = $temp_hash{$A_left};
+						$right_number = $temp_hash{$A_right};
+					}
+				}
+				###replace sample GT numbers
+				$sample = $left_number."/".$right_number;
+				for(my $h=1;$h < scalar @fields;$h++) {
+					$sample=$sample.":".$fields[$h];
+					my $teno = scalar @fields;
+				}
+				$sample_call_processed = $sample_call_processed."\t".$sample;
+			}
+		} else {
+			$sample_call_processed = $sample_call_processed."\t".$sample;
+		}
+	}
+	$sample_call_processed =~ s/^\t//;
+	return $sample_call_processed;
+}

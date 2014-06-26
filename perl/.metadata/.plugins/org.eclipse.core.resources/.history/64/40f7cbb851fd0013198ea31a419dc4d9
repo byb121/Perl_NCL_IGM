@@ -57,9 +57,26 @@ line: foreach $Line (<INPUT>){
 		
 		if ($ref_now =~ m/^[atgcATGC]$/) { # singlge base ref
 			#insertion
-			if(length($v_now)>length($ref_now)){$ref_now="-";$v_now=~s/^.//;$pos_1_now++;$pos_2_now=$pos_1_now;} #remove first 'ref' base
+			if(length($v_now)>length($ref_now)){
+				#my @ref_elements=split("", $ref_now);
+				my @var_chars=split(//, $v_now);
+				if ($ref_now eq $var_chars[0]) {
+					$ref_now="-";$v_now=~s/^.//;$pos_1_now++;$pos_2_now=$pos_1_now;
+				}
+			} #remove first 'ref' base if it is the same as first base of the variant
 		} else { # multiple bases ref
-			if(length($v_now)>length($ref_now)){ #insertion
+			my @var_chars=split(//, $v_now);
+			my @ref_chars=split(//, $ref_now);
+			if(length($v_now) >= length($ref_now)){ #insertion
+				for(my $i=0;$i<scalar @ref_chars;$i++) {
+					if($ref_chars[$i] eq $var_chars[$i]) {
+						if ($i != scalar @ref_chars) {
+							
+						} else {
+							$ref_now="-";
+						}
+					}
+				}
 				$ref_now="-";
 				for (my $i=1;$i<=length($ref);$i++){
 					$v_now=~s/^.//;
@@ -79,9 +96,6 @@ line: foreach $Line (<INPUT>){
 			}
 		}
 		
-
-						
-		
 		print OUT "$chr\t$pos_1_now\t$pos_2_now\t$ref_now\t$v_now\t$linesplit[0]\t$linesplit[1]\t$linesplit[2]\t".
            "$linesplit[3]\t$out_var\t$linesplit[5]\t$linesplit[6]\t$linesplit[7]\t$linesplit[8]\t$Sample_Call_Processed\n";
 	}
@@ -90,6 +104,7 @@ close OUT;
 close INPUT;
 
 exit;
+
 
 sub AddGenoTypeToSampleCalls_CompondHet {
 	my ($first_V, $variants, $format, $sample_call) = @_;
@@ -123,6 +138,22 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 			}
 			
 			if( $first_V eq $variants) {
+				if ($GQ < $gene_type_call_qual) {
+					#$GT = "R/R";
+					$GT = "NA"; #low qual genotype ... make a null call "NA"
+				} elsif ($GT =~ m/0\/0/) {
+					$GT = "R/R";
+				} elsif ($GT =~ m/0\/[123456789]/) {
+					$GT = "R/V";
+				} elsif ($GT =~ m/([123456789])\/([123456789])/) {
+					my $left = $1;
+					my $right = $2;
+					if($left!=$right) {
+					$GT = "V1/V2"; 
+					} else {
+					$GT = "V/V";
+					}
+				}
 				$sample_call_processed = $sample_call_processed."\t".$sample;
 			} else {
 				#determine which alternative allele is moved to the front
@@ -228,4 +259,3 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 	$sample_call_processed =~ s/^\t//;
 	return $sample_call_processed;
 }
-
