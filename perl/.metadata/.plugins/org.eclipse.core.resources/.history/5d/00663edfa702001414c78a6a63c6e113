@@ -5,9 +5,9 @@ use Getopt::Long;
 
 my $fastq1;
 my $fastq2;
+my $Results=GetOptions("1=s"=>\$fastq1, "2=s"=>\$fastq2);
 my $output_file1 = $fastq1.".polyN_removed.txt";
 my $output_file2 = $fastq2.".polyN_removed.txt";
-my $Results=GetOptions("1=s"=>\$fastq1, "2=s"=>\$fastq2, "o1=s"=>\$output_file1, "o2=s"=>\$output_file2);
 
 my $i = 1;
 my %shorts;
