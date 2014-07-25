@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;ExomePipeline/vcf2GQscores.pl&apos; to &apos;FilterVCF_GQscores.pl&apos;" description="Rename resource &apos;vcf2GQscores.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="vcf2GQscores.pl" name="FilterVCF_GQscores.pl" stamp="1406281185992" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;ExomePipeline/VCFpositionFilter.pl&apos; to &apos;FilterVCF_position.pl&apos;" description="Rename resource &apos;VCFpositionFilter.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="VCFpositionFilter.pl" name="FilterVCF_position.pl" stamp="1406281220768" updateReferences="true"/>
+</session>
