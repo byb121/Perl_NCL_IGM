@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+print "\n";
+print "####################################################################################\n";
+print "#         output a new vcf file which have both HC and Freebayes calls             #\n";
+print "#  insert a new format field for each sample call -  CV (Called in variant caller) #\n";
+print "# H: Called in HC only, HF: Called in both callers, F: Called in  Freebayes only.  #\n";
+print "#              Consensus rules may be vary from version to version                 #\n";
+print "#                                Check with a expert for details                   #\n";
+print "####################################################################################\n";
+
+
+my $fai_file; #this is used to retreive chromosome names
+my $input_FREE_vcf;
+my $input_HC_vcf;
+my $output_vcf;
+
+my $help;
+usage() if ( @ARGV < 1 || ! GetOptions('help|?' => \$help, "fai=s"=>\$fai_file, "FREE=s"=>\$input_FREE_vcf, 
+	'HC=s' => \$input_HC_vcf, 'output=s' => \$output_vcf ) || defined $help );
+
+#read in the fai file
+my %chros;
+open FAI, "$fai_file" or die "Can not open the fasta index file: $fai_file\n";
+while (my $line = <FAI> ) {
+	chomp $line;
+	my @eles = split("\t", $line);
+	if (! exists $chros{$eles[0]}) {
+		$chros{$eles[0]} = $eles[1];
+	} else {
+		print "Error: duplicated chrosome name found.\n";
+		exit 1;
+	}
+}
+
+# need several line to play with the headers
+open OUTPUT, "$output_vcf" or die "Can not open the fasta index file: $output_vcf\n";
+
+#open both inputs and output
+my $chr="1"; # to test, will need to loop all chromosomes
+open my $FREE, "$input_FREE_vcf" or die "Can not reads the freebayes vcf file: $input_FREE_vcf\n";
+open my $HC, "$input_HC_vcf" or die "Can not open the HC vcf file: $input_HC_vcf\n";
+
+my $free_line = read_file_line($FREE);
+my $HC_line = read_file_line($HC);
+while ($free_line and $HC_line) {
+	if($free_line =~ m/^$chr\t/ && $HC_line =~ m/^$chr\t/) {
+		my $free_chr;
+		my $free_pos;
+		my $HC_chr;
+		my $HC_pos;
+		my @f_eles = split("\t", $free_line);
+		$free_chr = $f_eles[0];
+		$free_pos = $f_eles[1];
+		my @h_eles = split("\t", $HC_line);
+		$HC_chr = $h_eles[0];
+		$HC_pos = $h_eles[1];
+		
+		### has to be a keep going loop
+		if ($free_pos < $HC_pos) {
+			my $output_line = FREE_filter($free_line);
+			if ($output_line) {
+				print OUTPUT $output_line."\n";
+			}
+			next freebayes;
+		} elsif ($free_pos > $HC_pos) {
+			my $output_line = HC_filter($HC_line);
+			if ($output_line) {
+				print OUTPUT $output_line."\n";
+			}
+			next HC;
+		} else {
+			
+		}		
+	}
+}
+
+#compare lines of the same chromosome
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub FREE_filter {
+	
+}
+
+sub HC_filter {
+	
+}
+
+sub Consensus_call {
+	
+}
+
+sub usage {
+    print "Unknown option: @_\n" if ( @_ );
+    print "\nusage: VCF_2_annotated_excel_20131120.pl \n";
+    print "--vcf input vcf file (of a single sample or a family;\n";
+    print "--InterestedGenes file of interested gene names list (optional); Format: Ensembl gene IDs on the 1st column.\n"; 
+    print "--out output excel file name (optional, only when required);\n";
+    print "--outAll output \'Everthing\' table to a sparate file to reduce memory loading excel file (optional, only when required).\n";
+    print "--CNV CNV result file, output of HG's Annotate_CNVs_combine_multiple_files.pl, sample names must be consistent with the vcf.\n";
+    print "--exomiserXLS Exomiser result files, separated with ',' it must be in XLS format.\n";
+    print "--add_genotypeCall_flags=(Yes/No), anyt word starting with letter \"y\" will be considered as yes.\n\n";
+	return(1);
+}
+
+sub read_file_line { #copied here: http://stackoverflow.com/questions/2498937/how-can-i-walk-through-two-files-simultaneously-in-perl
+# not understanding what should be followed after shift, although I know it should be a file handler.
+  my $fh = shift;
+  if ($fh and my $line = <$fh>) {
+    chomp $line;
+    return $line;
+  }
+  return;
+}
+
