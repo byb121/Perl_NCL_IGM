@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="WorkbenchPreferenceDialogSettings">
-		<item value="209" key="DIALOG_Y_ORIGIN"/>
+		<item value="196" key="DIALOG_Y_ORIGIN"/>
 		<item value="253" key="DIALOG_X_ORIGIN"/>
 	</section>
 	<section name="org.eclipse.ui.internal.QuickAccess">
-		<item value="650" key="dialogHeight"/>
-		<item value="1044" key="dialogWidth"/>
+		<item value="656" key="dialogHeight"/>
+		<item value="1050" key="dialogWidth"/>
 		<list key="textEntries">
 		</list>
 		<list key="orderedElements">
@@ -26,7 +26,7 @@
 		<item value="702" key="DIALOG_WIDTH"/>
 		<item value="1|Lucida Grande|11.0|0|COCOA|1|LucidaGrande" key="DIALOG_FONT_NAME"/>
 		<item value="652" key="DIALOG_HEIGHT"/>
-		<item value="-134" key="DIALOG_Y_ORIGIN"/>
+		<item value="0" key="DIALOG_Y_ORIGIN"/>
 		<item value="272" key="DIALOG_X_ORIGIN"/>
 	</section>
 	<section name="ShowViewDialog">
