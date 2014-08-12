@@ -117,14 +117,22 @@ close INPUT;
 
 exit;
 
-
 sub AddGenoTypeToSampleCalls_CompondHet {
 	my ($first_V, $variants, $format, $sample_call) = @_;
+	my $gene_type_call_qual = 13; ##### genotype call quality cut off
 	my @format_fields = split(":", $format);
 	my $GT_index;
+	my $GQ_index;
+	my $AD_index;
 	for (my $i=0;$i<scalar @format_fields ;$i++){
 		if ($format_fields[$i] =~ m/GT/) {
 			$GT_index = $i;
+		}
+		if ($format_fields[$i] =~ m/GQ/) {
+			$GQ_index = $i;
+		}
+		if ($format_fields[$i] =~ m/AD/) {
+			$AD_index = $i;
 		}		
 	}
 	my $sample_call_processed=""; # vcf_sample1 \t geno_sample1 \t vcf_sample2 \t geno_sample2 ....
@@ -132,29 +140,73 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 	for(my $i=0;$i<scalar(@sample_call_split);$i++){
 		my $sample = $sample_call_split[$i];
 		if ($sample !~ m/\.\/\./) {
-			#print $sample."\n";
 			my @fields = split(":", $sample);
 			my $GT = $fields[$GT_index];
+			my $GQ = $fields[$GQ_index];
+			my $AD;
+			if(defined $AD_index) {
+				$AD = $fields[$AD_index];
+			}
+			
 			if( $first_V eq $variants) {
 				$sample_call_processed = $sample_call_processed."\t".$sample;
 			} else {
 				#determine which alternative allele is moved to the front
 				my @V = split("," , $variants);
+				my @AD_array;
+				if(defined $AD_index) {
+					@AD_array = split(",", $AD);
+				}
 				my $V_index;
+				my $the_first_V_AD_index; 
 				for(my $h=0;$h<scalar @V;$h++) {
 					if($first_V eq $V[$h]) {
 						$V_index = $h+1;
+						$the_first_V_AD_index = $V_index+1;
 					}
 				}
 				
 				my %temp_hash;
 				$temp_hash{$V_index} = 1;
+				my $new_AD;
+				if(defined $AD_index) {
+
+					if(scalar @AD_array == 1 && $AD_array[0] =~ m/\./ ) {
+						$new_AD = '.';
+					} else {
+						$new_AD = $AD_array[0].",".$AD_array[$the_first_V_AD_index-1];
+						for(my $h=1;$h < scalar @AD_array;$h++) {
+							if($h != $the_first_V_AD_index-1) {
+								$new_AD = $new_AD.",".$AD_array[$h];
+							}
+						}
+					}
+					
+				}
 				
 				my $j = 2;
 				for(my $h=1;$h<=scalar @V;$h++) {
 					if ($h != $V_index) {
 						$temp_hash{$h} = $j;
 						$j+=1;
+					}
+				}
+				
+				#adding genotye
+				if ($GQ < $gene_type_call_qual) {
+					#$GT = "R/R";
+					$GT = "NA"; #low qual null call!
+				} elsif ($GT =~ m/0\/0/) {
+					$GT = "R/R";
+				} elsif ($GT =~ m/0\/[123456789]/) {
+					$GT = "R/V";
+				} elsif ($GT =~ m/([123456789])\/([123456789])/) {
+					my $left = $1;
+					my $right = $2;
+					if($left!=$right) {
+						$GT = "V1/V2"; 
+					} else {
+						$GT = "V/V";
 					}
 				}
 				
@@ -179,9 +231,20 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 				###replace sample GT numbers
 				$sample = $left_number."/".$right_number;
 				for(my $h=1;$h < scalar @fields;$h++) {
-					$sample=$sample.":".$fields[$h];
+					if(defined $AD_index) {
+						if($h == $AD_index) {
+							$sample=$sample.":".$new_AD;
+						} else {
+							$sample=$sample.":".$fields[$h];
+						}
+					} else {
+						$sample=$sample.":".$fields[$h];
+					}
 					my $teno = scalar @fields;
+					#print "h is $h   total is $teno   fields[h] is $fields[$h]\n";
+					#print "$sample\n";
 				}
+				
 				$sample_call_processed = $sample_call_processed."\t".$sample;
 			}
 		} else {
@@ -191,3 +254,5 @@ sub AddGenoTypeToSampleCalls_CompondHet {
 	$sample_call_processed =~ s/^\t//;
 	return $sample_call_processed;
 }
+
+
