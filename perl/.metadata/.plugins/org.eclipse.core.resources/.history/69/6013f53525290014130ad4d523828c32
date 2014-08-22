@@ -307,13 +307,13 @@ sub HC_filter {
 						my @bases = split ("/", $GT);
 						my @alt_alleles = split(",", $AD);
 						if ($DP =~ /^\./ || $alt_alleles[$bases[1]] == 0) {
-							$bad_count += 1;
+							$bad_count =+ 1;
 							$output_string = $output_string."./."."\t";
 						} else {
 							$output_string = $output_string."$GT:$GQ:$DP:$AD:H"."\t";
 						}
 					} else {
-						$bad_count += 1;
+						$bad_count =+ 1;
 						$output_string = $output_string."./."."\t";
 					}
 				}
@@ -342,7 +342,7 @@ sub HC_filter {
 						my $GQ = $fields[$GQ_index];
 						$output_string = $output_string."$GT:$GQ:H"."\t";
 					} else {
-						$bad_count += 1;
+						$bad_count =+ 1;
 						$output_string = $output_string."./."."\t";
 					}
 				}

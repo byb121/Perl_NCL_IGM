@@ -64,13 +64,12 @@ Line: while ( my $line = <VCF> ) {
 					my @fields = split(":", $sample);
 					my $GQ = $fields[$GQ_index];
 					my $DP = $fields[$DP_index];
-					if ($DP =~ m/^\.$/) { # HalplotypeCaller output stringe zero covered var
+					if ($DP !~ m/^\.$/) { # HalplotypeCaller output stringe zero covered var
 						push @smaple_info, "./.";
 						next SAMPLE;
 					}
 					
 					if ($DP !~ m/^\d+/) {
-						#print "\n\nDP index:$DP_index    sample: $sample    DP:$DP\n";
 						print "Warning: DP is not just numbers. the line is skipped:\n$line\n";
 						next Line;
 					}

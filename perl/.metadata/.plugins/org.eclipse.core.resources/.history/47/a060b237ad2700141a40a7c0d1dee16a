@@ -289,7 +289,6 @@ sub HC_filter {
 		
 		if (defined $GT_index && defined $GQ_index && defined $DP_index && defined $AD_index ) {
 			my $output_string="";
-			my $bad_count = 0;
 			for(my $i=0;$i < scalar @temp; $i++){
 				if ($i <=7) {
 					$output_string = $output_string.$temp[$i]."\t";
@@ -304,30 +303,16 @@ sub HC_filter {
 						my $GQ = $fields[$GQ_index];
 						my $DP = $fields[$DP_index];
 						my $AD = $fields[$AD_index];
-						my @bases = split ("/", $GT);
-						my @alt_alleles = split(",", $AD);
-						if ($DP =~ /^\./ || $alt_alleles[$bases[1]] == 0) {
-							$bad_count += 1;
-							$output_string = $output_string."./."."\t";
-						} else {
-							$output_string = $output_string."$GT:$GQ:$DP:$AD:H"."\t";
-						}
+						$output_string = $output_string."$GT:$GQ:$DP:$AD:H"."\t";
 					} else {
-						$bad_count += 1;
 						$output_string = $output_string."./."."\t";
 					}
 				}
 			}
 			$output_string =~ s/\t$//;
-			if ($bad_count < (scalar @temp - 9)) {
-				return $output_string;
-				print "Error: HaplotypeCaller produces no valid call on this line:\n$line\n;";
-			} else {
-				return 0;
-			}
+			return $output_string;
 		} elsif (defined $GT_index && defined $GQ_index) {
 			my $output_string="";
-			my $bad_count = 0;
 			for(my $i=0;$i < scalar @temp; $i++){
 				if ($i <=7) {
 					$output_string = $output_string.$temp[$i]."\t";
@@ -342,20 +327,14 @@ sub HC_filter {
 						my $GQ = $fields[$GQ_index];
 						$output_string = $output_string."$GT:$GQ:H"."\t";
 					} else {
-						$bad_count += 1;
 						$output_string = $output_string."./."."\t";
 					}
 				}
 			}
 			$output_string =~ s/\t$//;
-			if ($bad_count < (scalar @temp - 9)) {
-				return $output_string;
-			} else {
-				print "Error: HaplotypeCaller produces no valid call on this line:\n$line\n;";
-				return 0;
-			}
+			return $output_string;
 		}else {
-			print "Error: HaplotypeCaller outputs not expected format line:\n$line\n;";
+			print "Error: HaplotypeCaller output not expected format line:\n$line\n;";
 			return 0;
 		}
 	} else {
@@ -796,7 +775,7 @@ sub Define_Header {
 	while (my $line = <FREE>) {
 		chomp $line;
 		if ($line =~ m/^\#/) {
-			if ($line !~ m/^\#\#GATKCommandLine/ && $line !~ m/^\#\#fileformat/ &&  $line !~ m/^\#\#contig/ &&  $line !~ m/^\#CHROM/) {
+			if ($line !~ m/^\#\#fileformat/ &&  $line !~ m/^\#\#contig/ &&  $line !~ m/^\#CHROM/) {
 				my @eles = split(",", $line);
 				if ( ! exists $ID{$eles[0]}) {
 					$ID{$eles[0]} = 1;
