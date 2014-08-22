@@ -42,8 +42,7 @@ while (my $line = <OM> ) {
 }
 close OM;
 
-push @output, "Index_chip\tName_chip\tChr_chip_h19\tPos_chip_h19\t
-				SNP_chip\tA\tB\tRsID_chip\tChr_GRCh38\tPos_GRCh38\tID_dbsnp141\tRef_dbsnp141\tAlt_dbsnp141\n";
+push @output, "Index_chip\tName_chip\tChr_chip_h19\tPos_chip_h19\tSNP_chip\tA\tB\tRsID_chip\tChr_GRCh38\tPos_GRCh38\tID_dbsnp141\tRef_dbsnp141\tAlt_dbsnp141\n";
 
 
 print "reading in $chipSNP.\n";
@@ -54,7 +53,7 @@ while (my $line = <CHIP> ) {
 	if ($eles[0] eq "Index") {
 		next;
 	} else {
-		$eles[4] =~ s/\[|\]//;
+		$eles[4] =~ s/\[|\]//g;
 		my @ab = split("/", $eles[4]);
 		my $string = $line."\t".$ab[0]."\t".$ab[1]."\t".$om{$eles[1]};
 		if (exists $db{$om{$eles[1]}}) {
