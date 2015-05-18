@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<section name="ChooseWorkspaceDialogSettings">
-		<item value="461" key="DIALOG_Y_ORIGIN"/>
-		<item value="638" key="DIALOG_X_ORIGIN"/>
-	</section>
-	<section name="WORKBENCH_SETTINGS">
-		<list key="ENABLED_TRANSFERS">
-		</list>
-	</section>
 	<section name="ExternalProjectImportWizard">
-		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
-		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
 		<item value="false" key="WizardProjectsImportPage.STORE_NESTED_PROJECTS"/>
+		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
+		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
 			<item value="/home/yaobo/Documents/Dropbox/Bob/perl"/>
 		</list>
@@ -19,22 +11,30 @@
 			<item value=""/>
 		</list>
 	</section>
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
 	<section name="ResourceNavigator">
 		<item value="Aggregate for window 1280913368174" key="ResourceWorkingSetFilter.STORE_WORKING_SET"/>
-		<item value="false" key="LINK_NAVIGATOR_TO_EDITOR"/>
 		<item value="1" key="ResourceViewer.STORE_SORT_TYPE"/>
-	</section>
-	<section name="SaveAsDialogSettings">
-		<item value="613" key="DIALOG_WIDTH"/>
-		<item value="83" key="DIALOG_Y_ORIGIN"/>
-		<item value="596" key="DIALOG_HEIGHT"/>
-		<item value="200" key="DIALOG_X_ORIGIN"/>
-		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="false" key="LINK_NAVIGATOR_TO_EDITOR"/>
 	</section>
 	<section name="NewWizardAction">
 		<item value="org.epic.newproject.wizard" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>
 		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
 			<item value="org.epic.newproject"/>
 		</list>
+	</section>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item value="461" key="DIALOG_Y_ORIGIN"/>
+		<item value="638" key="DIALOG_X_ORIGIN"/>
+	</section>
+	<section name="SaveAsDialogSettings">
+		<item value="613" key="DIALOG_WIDTH"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="596" key="DIALOG_HEIGHT"/>
+		<item value="83" key="DIALOG_Y_ORIGIN"/>
+		<item value="200" key="DIALOG_X_ORIGIN"/>
 	</section>
 </section>

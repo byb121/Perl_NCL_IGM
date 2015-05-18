@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;RNA_seq/processCuffcompareTracking.pl&apos; to &apos;processCuffcompareTrackingtofileterGTF.pl&apos;" description="Rename resource &apos;processCuffcompareTracking.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="processCuffcompareTracking.pl" name="processCuffcompareTrackingtofileterGTF.pl" stamp="1352988325139" updateReferences="true"/>
-</session>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;ExomePipeline/InHouse_MAF_list_From_GATK_vcf_ontarget.pl&apos; to &apos;InHouse_MAF_list_From_GATK_vcf.pl&apos;" description="Rename resource &apos;InHouse_MAF_list_From_GATK_vcf_ontarget.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="InHouse_MAF_list_From_GATK_vcf_ontarget.pl" name="InHouse_MAF_list_From_GATK_vcf.pl" stamp="1393432841760" updateReferences="true"/>
-</session>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;ExomePipeline/VCF_2_annotated_excel.pl&apos; to &apos;VCF_2_annotated_excel_20131120.pl&apos;" description="Rename resource &apos;VCF_2_annotated_excel.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="VCF_2_annotated_excel.pl" name="VCF_2_annotated_excel_20131120.pl" stamp="1385040747929" updateReferences="true"/>
-</session>

@@ -2,36 +2,31 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="CNV_regions" key="selection"/>
+		<item value="&amp;&amp;" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="CNV_regions"/>
-			<item value="Variants_on_samples"/>
-			<item value="gene_sample_CNV_count"/>
-			<item value="all_gene_id"/>
-			<item value="exomiserXLSfiles"/>
-			<item value="print"/>
-			<item value="while"/>
-			<item value="push"/>
+			<item value="&amp;&amp;"/>
+			<item value="keys"/>
+			<item value="split"/>
+			<item value="sort"/>
+			<item value="vcf"/>
+			<item value="fa"/>
+			<item value="AA"/>
+			<item value="output"/>
 		</list>
 		<list key="replacehistory">
-			<item value="$exomiserXLSfiles"/>
-			<item value="xlsFile"/>
-			<item value="NA"/>
-			<item value="write_row"/>
-			<item value="Acc"/>
-			<item value="$samplePath"/>
-			<item value=""/>
+			<item value="$geno_B"/>
+			<item value="$geno_A"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="289" key="DIALOG_WIDTH"/>
+		<item value="309" key="DIALOG_WIDTH"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="572" key="DIALOG_HEIGHT"/>
-		<item value="275" key="DIALOG_Y_ORIGIN"/>
-		<item value="1115" key="DIALOG_X_ORIGIN"/>
+		<item value="648" key="DIALOG_HEIGHT"/>
+		<item value="575" key="DIALOG_X_ORIGIN"/>
+		<item value="338" key="DIALOG_Y_ORIGIN"/>
 	</section>
 </section>

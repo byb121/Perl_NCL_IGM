@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;RNA_seq/BlastFastq2Fastq.pl&apos; to &apos;BlastFasta2Fasta.pl&apos;" description="Rename resource &apos;BlastFastq2Fastq.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="BlastFastq2Fastq.pl" name="BlastFasta2Fasta.pl" stamp="1371049630543" updateReferences="true"/>
-</session>

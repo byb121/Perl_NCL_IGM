@@ -1,28 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item value="0" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
 	<item value="true" key="CommitDialog.showUntracked"/>
+	<item value="/home/yaobo/Dropbox/Bob/git/.git" key="GitSelectRepositoryPage.lastRepository"/>
 	<list key="RepositorySelectionPage.UsedUris">
 		<item value="git@github.com:byb121/Perl_NCL_IGM.git"/>
 	</list>
 	<list key="CommitDialog.authorValues">
+		<item value="Yaobo Xu &lt;thelastsheep@hotmail.com&gt;"/>
 		<item value="byb121 &lt;thelastsheep@hotmail.com&gt;"/>
 	</list>
 	<list key="CommitDialog.committerValues">
+		<item value="Yaobo Xu &lt;thelastsheep@hotmail.com&gt;"/>
 		<item value="byb121 &lt;thelastsheep@hotmail.com&gt;"/>
 	</list>
+	<section name="GitImportWizard">
+		<item value="true" key="GitProjectsImportPage.STORE_NESTED_PROJECTS"/>
+	</section>
 	<section name="org.eclipse.egit.ui.internal.push.PushResultDialog.dialogBounds">
 		<item value="613" key="DIALOG_WIDTH"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="415" key="DIALOG_HEIGHT"/>
+		<item value="443" key="DIALOG_HEIGHT"/>
 		<item value="611" key="DIALOG_Y_ORIGIN"/>
 		<item value="215" key="DIALOG_X_ORIGIN"/>
 	</section>
 	<section name="org.eclipse.egit.ui.COMMIT_DIALOG_SECTION">
 		<item value="626" key="DIALOG_WIDTH"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="741" key="DIALOG_HEIGHT"/>
-		<item value="120" key="DIALOG_Y_ORIGIN"/>
-		<item value="331" key="DIALOG_X_ORIGIN"/>
+		<item value="769" key="DIALOG_HEIGHT"/>
+		<item value="185" key="DIALOG_Y_ORIGIN"/>
+		<item value="79" key="DIALOG_X_ORIGIN"/>
 	</section>
 	<section name="GitCommitMessageComponent">
 	</section>

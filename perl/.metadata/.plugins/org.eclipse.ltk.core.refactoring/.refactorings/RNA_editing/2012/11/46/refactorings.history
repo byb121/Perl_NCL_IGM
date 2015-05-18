@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;RNA_editing/produceTableForRegressionInR_2.pl&apos; to &apos;produceTableForRegressionInR.pl&apos;" description="Rename resource &apos;produceTableForRegressionInR_2.pl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="produceTableForRegressionInR_2.pl" name="produceTableForRegressionInR.pl" stamp="1352977696499" updateReferences="true"/>
-</session>

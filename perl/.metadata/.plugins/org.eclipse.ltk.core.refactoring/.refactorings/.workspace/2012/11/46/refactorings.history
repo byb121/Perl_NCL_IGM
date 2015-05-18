@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;RNA_editing/produceTableForRegressionInR.pl&apos;" deleteContents="false" description="Delete resource &apos;RNA_editing/produceTableForRegressionInR.pl&apos;" element1="/RNA_editing/produceTableForRegressionInR.pl" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1352977627584"/>
-</session>
