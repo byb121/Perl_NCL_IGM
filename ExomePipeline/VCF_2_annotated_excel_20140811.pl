@@ -23,6 +23,8 @@ print "# 2. popFreqMax is used as MAF filtering                                 
 print "# 3. Exomiser is not longer supported                                                      #\n";
 print "# 4. variants will have at least this number of supporting reads, otherwise will not       #\n";
 print "#                                    count as a het/homo for a gene, currently set on 5    #\n";
+print "# 5. Added functino to use batch MAFs for filtering, when provided inHouseMAF will be      #\n";
+print "#                                      ignored. Curent filtering thershold is set to 0.25  #\n";
 print "############################################################################################\n";
 
 my $vcf_in;
@@ -31,6 +33,7 @@ my $InterestedGenefile=""; #Ensembl gene ids on each line
 my $CNV_file="";
 my $output_excel=""; #if empty then inHouse annotated file will not converted to excel file
 my $output_excel_everything=""; # file to output table 'everything'
+my $batch_MAF_file="";
 my $add_genotypeCall_flags="No";
 my $help;
 my $compount_var_supporting_reads_threshold = 5; #variants will have at least this number of supporting reads, otherwise will not count as a het/homo for a gene
@@ -43,7 +46,7 @@ my $annovar_dir ="/sharedlustre/IGM/annovar_2014jul14";
 usage() if ( @ARGV < 1 || ! GetOptions('help|?' => \$help, "vcf=s"=>\$vcf_in, "InterestedGenes=s"=>\$InterestedGenefile, 'CNV=s' => \$CNV_file, 
 			'out=s' => \$output_excel, 'outAll=s' => \$output_excel_everything, 
 			'add_genotypeCall_flags=s' => \$add_genotypeCall_flags, 
-			'AnnovarDIR=s' => \$annovar_dir ) || defined $help );
+			'AnnovarDIR=s' => \$annovar_dir,  'batchMAF=s' => \$batch_MAF_file ) || defined $help );
 
 
 unless (defined $vcf_in && -e $vcf_in) {
@@ -136,6 +139,16 @@ if (-e $ens_gene_OMIM_Uniprot_Acc) {
 	exit;
 }
 
+if ($batch_MAF_file ne "") {
+	print "Require db file: $batch_MAF_file\n";
+	if (-e $batch_MAF_file) {
+		print "Found $batch_MAF_file\n";
+	} else {
+		print "$batch_MAF_file not exist\n exit\n";
+		exit;
+	}
+}
+
 # An comlumn to tell if the variant is a SNP or INDEL
 my $SNPorINDEL; # this will add a column to indicate the variant is a SNP/indel; easy for filtering
 
@@ -148,6 +161,7 @@ my %OMIM;
 my %isInterestedGenes;
 my %OmimAcc;
 my %UniprotAcc;
+my %batchMAF;
 
 my $en_genes_ref = GetGeneCoords($genefile);
 %en_genes = %$en_genes_ref;
@@ -162,6 +176,11 @@ my $OMIM_ref = GetOMIManno($OMIMfile);
 if ($InterestedGenefile ne "") {
 	my $isInterestedGenes_ref = GetIsInterestedGenes($InterestedGenefile);
 	%isInterestedGenes = %$isInterestedGenes_ref;
+}
+my $batchMAF_ref;
+if ($batch_MAF_file ne "") {
+	my $batchMAF_ref = GetInHouseMafGATK($batch_MAF_file);
+	%batchMAF = %$batchMAF_ref;
 }
 
 my $OmimAcc_ref = GetOmimAcc($ens_gene_OMIM_Uniprot_Acc);
@@ -327,23 +346,37 @@ while (my $line = <VCF> ) {
 		if (exists $inHouse_MAF{$query_chr}{$pos1}{$ref1}{$alt1} ) {
 			$maf = $inHouse_MAF{$query_chr}{$pos1}{$ref1}{$alt1};
 		} else {
-			$maf = "NA";
+			$maf = "0";
 		}
 
-		#find in house 'GATK' MAF for variants
+		#find in house 'GATK' MAF and batch MAF for variants
 		############################################## need to map v with Annovar format
 		my $maf_GATK = "";
 		if (exists $inHouse_MAF_GATK{$annovar_chr}{$annovar_pos}{$annovar_R}{$annovar_A}) {
 			$maf_GATK = $inHouse_MAF_GATK{$annovar_chr}{$annovar_pos}{$annovar_R}{$annovar_A};
 		} else {
-			$maf_GATK = "NA";
+			$maf_GATK = "0";
+		}
+		
+		my $maf_batch = "";
+		if ($batch_MAF_file ne "") {
+			if (exists $batchMAF{$annovar_chr}{$annovar_pos}{$annovar_R}{$annovar_A}) {
+				$maf_batch = $batchMAF{$annovar_chr}{$annovar_pos}{$annovar_R}{$annovar_A};
+			} else {
+				$maf_batch = "0";
+			}
 		}
 		############################################## vcf format changed done #######
 		
 		my $Sample_Call_processed = AddGenoTypeToSampleCalls($FORMAT, $Sample_Call);
 		for (my $i=0;$i<=77;$i++){ push @output, $elements[$i]."\t";}
-		push @output, $Sample_Call_processed."\t".$SNPorINDEL ."\t".$gene_name."\t".$ens_id."\t".$isInterested."\t"
-		.$maf."\t".$maf_GATK."\t".$omim_anno."\t".$genecard_link."\t".$omim_link."\t".$uniprot_link."\n";
+		if ($batch_MAF_file ne "") {
+			push @output, $Sample_Call_processed."\t".$SNPorINDEL ."\t".$gene_name."\t".$ens_id."\t".$isInterested."\t"
+			.$maf_batch."\t".$maf_GATK."\t".$omim_anno."\t".$genecard_link."\t".$omim_link."\t".$uniprot_link."\n";
+		} else {
+			push @output, $Sample_Call_processed."\t".$SNPorINDEL ."\t".$gene_name."\t".$ens_id."\t".$isInterested."\t"
+			.$maf."\t".$maf_GATK."\t".$omim_anno."\t".$genecard_link."\t".$omim_link."\t".$uniprot_link."\n";
+		}
 	}
 }
 close (VCF);
@@ -720,7 +753,7 @@ while (my $line=<INPUT>) {
 			
 			# for filtered spreadsheet
 
-			if( $elements[56] <= 0.05 && $elements[$length-8] <= 0.05 && $elements[$length-7] <= 0.05) {
+			if( $elements[56] <= 0.05 && $elements[$length-7] <= 0.05 && $elements[$length-8] <= 0.25) { #batch MAF filtering is very relax
 				push @output_filtered, $sample_string_final;
 				
 				#unless(exists $gene_name_count{$elements[$length-9]}) { # could be deleted
@@ -935,6 +968,10 @@ my @header_3 = ('Func.knownGene','ExonicFunc.knownGene','AAChange.knownGene','Fu
 'LJB23_MutationTaster_score_converted', 'LJB23_MutationTaster_pred', 'LJB23_MutationAssessor_score_converted', 
 'LJB23_MutationAssessor_pred', 'LJB23_FATHMM_score_converted', 'LJB23_FATHMM_pred', 'LJB23_RadialSVM_score_converted', 
 'LJB23_RadialSVM_pred', 'LJB23_LR_score', 'LJB23_LR_pred', 'LJB23_GERP++', 'LJB23_PhyloP', 'LJB23_SiPhy');
+
+if ($batch_MAF_file ne "") {
+	$header_3[7] = "Batch_MAF";
+}
 
 my $superDupsRow=9;
 

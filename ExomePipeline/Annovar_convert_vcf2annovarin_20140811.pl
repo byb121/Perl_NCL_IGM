@@ -21,6 +21,15 @@ line: foreach $Line (<INPUT>){
 	if($Line=~/^#/){next line;}
 	chomp $Line;
 	my @linesplit = split (/\t/,$Line);
+	###correct chr name with no chr prefix
+	if ($linesplit[0] =~ /^x$/) {$linesplit[0] = "X";}
+	if ($linesplit[0] =~ /^y$/) {$linesplit[0] = "Y";}
+	if ($linesplit[0] =~ /^MT$/) {$linesplit[0] = "M";}
+	if ($linesplit[0] =~ /^m$/) {$linesplit[0] = "M";}
+	$linesplit[0] =~ s/\.\d+$//;
+	$linesplit[1] =~ s/\.\d+$//;
+	if ($linesplit[0] !~ /^chr/) {$linesplit[0] = "chr".$linesplit[0];}
+	
 	my $chr = $linesplit[0];
 	$chr =~ s/chr//;
 	my $pos_1 = $linesplit[1];
@@ -107,9 +116,10 @@ line: foreach $Line (<INPUT>){
 				$pos_2_now = $pos_1_now + length($ref_now) - 1;
 			}
 		}
-		
-		print OUT "$chr\t$pos_1_now\t$pos_2_now\t$ref_now\t$v_now\t$linesplit[0]\t$linesplit[1]\t$linesplit[2]\t".
-           "$linesplit[3]\t$out_var\t$linesplit[5]\t$linesplit[6]\t$linesplit[7]\t$linesplit[8]\t$Sample_Call_Processed\n";
+		if ($Sample_Call_Processed =~ m/1\// || $Sample_Call_Processed =~ m/\/1/) { # if the first variant is still the interest of the genotype call in any sample
+			print OUT "$chr\t$pos_1_now\t$pos_2_now\t$ref_now\t$v_now\t$linesplit[0]\t$linesplit[1]\t$linesplit[2]\t".
+           	"$linesplit[3]\t$out_var\t$linesplit[5]\t$linesplit[6]\t$linesplit[7]\t$linesplit[8]\t$Sample_Call_Processed\n";
+		}
 	}
 }
 close OUT;
