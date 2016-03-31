@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 12 resources" deleteContents="false" description="Delete 12 resources" element1="/AllelicAnalysis" element10="/OLD_ToUsePolyPhen" element11="/RNA_editing" element12="/RNA_seq" element2="/arcOGEN_GWAS" element3="/Coverage" element4="/ExomePipeline" element5="/For_Commom_Problems" element6="/GWAS_NICR_2015May" element7="/microRNA" element8="/mito_pipe" element9="/MythelationChip450K" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="12" stamp="1459412764349"/>
+</session>

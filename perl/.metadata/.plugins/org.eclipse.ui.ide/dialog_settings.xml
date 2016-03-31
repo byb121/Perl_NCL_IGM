@@ -20,6 +20,9 @@
 		<item value="1" key="ResourceViewer.STORE_SORT_TYPE"/>
 		<item value="false" key="LINK_NAVIGATOR_TO_EDITOR"/>
 	</section>
+	<section name="org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea">
+		<item value="/home/yaobo/Dropbox/Bob/git" key="OUTSIDE_LOCATION"/>
+	</section>
 	<section name="NewWizardAction">
 		<item value="org.epic.newproject.wizard" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>
 		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
